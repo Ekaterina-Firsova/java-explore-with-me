@@ -9,7 +9,6 @@ import ru.practicum.ewm.ViewStatsDto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
