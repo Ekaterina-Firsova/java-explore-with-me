@@ -30,7 +30,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @RestClientTest
 @ContextConfiguration(classes = StatsClientImpl.class)
 @TestPropertySource(properties = "stats.server.uri=http://localhost:9090")
-class StatsClientImplIT {
+class StatsClientImplTest {
 
     @Autowired
     private MockRestServiceServer mockServer;
@@ -53,18 +53,16 @@ class StatsClientImplIT {
 
     @Test
     void testSaveHit() throws Exception {
-        final String requestBody = """
-            {
-              "app": "app",
-              "uri": "/events/1",
-              "ip": "192.163.0.1",
-              "timestamp": "2023-11-04 11:01:00"
-            }
-            """;
+        final String requestBody = "{\n" +
+                "  \"app\": \"app\",\n" +
+                "  \"uri\": \"/events/1\",\n" +
+                "  \"ip\": \"192.163.0.1\",\n" +
+                "  \"timestamp\": \"2023-11-04 11:01:00\"\n" +
+                "}";
 
         LocalDateTime fixedDateTime = LocalDateTime.parse("2023-11-04 11:01:00", StatsClientImpl.getFormatter());
         final EndpointHitDto endpointHitDto =
-                new EndpointHitDto("app", fixedDateTime , "/events/1", "192.163.0.1");
+                new EndpointHitDto("app", fixedDateTime, "/events/1", "192.163.0.1");
         final String url = baseUrl + "/hit";
 
         mockServer.expect(ExpectedCount.once(), requestTo(url))
@@ -79,18 +77,16 @@ class StatsClientImplIT {
 
     @Test
     void testSaveHitError() throws Exception {
-        final String requestBody = """
-            {
-              "app": "app",
-              "uri": "/events/1",
-              "ip": "192.163.0.1",
-              "timestamp": "2023-11-04 11:01:00"
-            }
-            """;
+        final String requestBody = "{\n" +
+                "  \"app\": \"app\",\n" +
+                "  \"uri\": \"/events/1\",\n" +
+                "  \"ip\": \"192.163.0.1\",\n" +
+                "  \"timestamp\": \"2023-11-04 11:01:00\"\n" +
+                "}";
 
         LocalDateTime fixedDateTime = LocalDateTime.parse("2023-11-04 11:01:00", StatsClientImpl.getFormatter());
         final EndpointHitDto endpointHitDto =
-                new EndpointHitDto("app", fixedDateTime , "/events/1", "192.163.0.1");
+                new EndpointHitDto("app", fixedDateTime, "/events/1", "192.163.0.1");
         final String url = baseUrl + "/hit";
 
         // Настраиваем ожидания для mockServer, чтобы он ответил с ошибкой
@@ -111,17 +107,16 @@ class StatsClientImplIT {
         List<String> uris = List.of("/events/1");
 
         // Ожидаемый ответ от сервера
-        String expectedJsonResponse = """
-            [
-              {
-                "app": "app",
-                "uri": "/events/1",
-                "hits": 5
-              }
-            ]
-            """;
+        final String expectedJsonResponse = "[\n" +
+                "  {\n" +
+                "    \"app\": \"app\",\n" +
+                "    \"uri\": \"/events/1\",\n" +
+                "    \"hits\": 5\n" +
+                "  }\n" +
+                "]";
 
-        mockServer.expect(requestTo("http://localhost:9090/stats?start=2023-11-01%2000:00:00&end=2023-11-02%2000:00:00&uris=/events/1&unique=true"))                .andExpect(method(HttpMethod.GET))
+        mockServer.expect(requestTo("http://localhost:9090/stats?start=2023-11-01%2000:00:00&end=2023-11-02%2000:00:00&uris=/events/1&unique=true"))
+                .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(expectedJsonResponse, MediaType.APPLICATION_JSON));
 
         List<ViewStatsDto> actualResponse = client.getStats(start, end, uris, true);
@@ -137,7 +132,8 @@ class StatsClientImplIT {
         LocalDateTime end = LocalDateTime.parse("2023-11-02 00:00:00", StatsClientImpl.getFormatter());
         List<String> uris = List.of("/events/1");
 
-        mockServer.expect(requestTo("http://localhost:9090/stats?start=2023-11-01%2000:00:00&end=2023-11-02%2000:00:00&uris=/events/1&unique=true"))                .andExpect(method(HttpMethod.GET))
+        mockServer.expect(requestTo("http://localhost:9090/stats?start=2023-11-01%2000:00:00&end=2023-11-02%2000:00:00&uris=/events/1&unique=true"))
+                .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
 
         List<ViewStatsDto> actualResponse = client.getStats(start, end, uris, true);
