@@ -9,10 +9,12 @@ import ru.practicum.ewm.ViewStatsDto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class StatsServiceImpl implements StatsService{
+public class StatsServiceImpl implements StatsService {
+
     private final StatsRepository repository;
 
     @Override
@@ -27,5 +29,4 @@ public class StatsServiceImpl implements StatsService{
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         return repository.findStatisticsByParams(start, end, uris, unique);
     }
-
 }
