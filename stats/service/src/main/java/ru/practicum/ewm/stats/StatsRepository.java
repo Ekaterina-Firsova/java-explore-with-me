@@ -25,22 +25,22 @@ public interface StatsRepository extends JpaRepository<EndpointHit, Long> {
 //            @Param("uris") List<String> uris,
 //            @Param("unique") boolean unique);
 
-    @Query("SELECT new ru.practicum.ewm.ViewStatsDto(e.app, e.uri, COUNT(e) AS hits) " +
+    @Query("SELECT new ru.practicum.ewm.ViewStatsDto(e.app, e.uri, (1L) AS hits) " +
             "FROM EndpointHit e " +
             "WHERE e.timestamp BETWEEN :start AND :end " +
             "AND (:uris IS NULL OR e.uri IN :uris) " +
-            "GROUP BY e.app, e.uri " +
-            "ORDER BY hits DESC")
+            "GROUP BY e.app, e.uri ")
     List<ViewStatsDto> findUniqueStatisticsByParams(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
             @Param("uris") List<String> uris);
 
-    @Query("SELECT new ru.practicum.ewm.ViewStatsDto(e.app, e.uri, (1L) AS hits ) " +
+    @Query("SELECT new ru.practicum.ewm.ViewStatsDto(e.app, e.uri, COUNT(e) AS hits ) " +
             "FROM EndpointHit e " +
             "WHERE e.timestamp BETWEEN :start AND :end " +
             "AND (:uris IS NULL OR e.uri IN :uris) " +
-            "ORDER BY e.app, e.uri")
+            "GROUP BY e.app, e.uri " +
+            "ORDER BY hits DESC")
     List<ViewStatsDto> findStatisticsByParams(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
