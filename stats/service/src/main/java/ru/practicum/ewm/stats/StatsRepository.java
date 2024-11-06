@@ -17,7 +17,8 @@ public interface StatsRepository extends JpaRepository<EndpointHit, Long> {
             "WHERE s.timestamp BETWEEN :start AND :end " +
             "AND (:uris IS NULL OR s.uri IN :uris) " +
             "GROUP BY s.app, s.uri " +
-            "HAVING (:unique = false OR COUNT(DISTINCT s.ip) = COUNT(s.ip))")
+            "HAVING (:unique = false OR COUNT(DISTINCT s.ip) = COUNT(s.ip)) " +
+            "ORDER BY hits DESC")
     List<ViewStatsDto> findStatisticsByParams(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
