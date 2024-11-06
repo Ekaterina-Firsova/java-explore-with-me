@@ -19,13 +19,21 @@ public class StatsServiceImpl implements StatsService {
     @Override
     @Transactional
     public void addHit(EndpointHitDto endpointHitDto) {
-        System.out.println(endpointHitDto);
-
         repository.save(EndpointHitMapper.toEndpointHit(endpointHitDto));
     }
 
     @Override
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        return repository.findStatisticsByParams(start, end, uris, unique);
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException("Start date must be before end date.");
+        }
+
+        if (unique) {
+            return repository.findUniqueStatisticsByParams(start, end, uris);
+        } else {
+            //return List.of();
+            //return repository.findStatisticsByParams(start, end, uris, unique);
+            return repository.findStatisticsByParams(start, end, uris);
+        }
     }
 }
