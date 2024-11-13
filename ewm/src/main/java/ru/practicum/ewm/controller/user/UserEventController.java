@@ -42,7 +42,7 @@ public class UserEventController {
     //добавление нового события
     @PostMapping("/{userId}/events")
     public ResponseEntity<?> addEvent(
-                        @RequestBody NewEventDto newEventDto,
+                        @Valid @RequestBody NewEventDto newEventDto,
                         @PathVariable Long userId) {
 
         log.info("Request POST /users/{}/events with body : {}", userId, newEventDto);
@@ -97,7 +97,7 @@ public class UserEventController {
     public ResponseEntity<?> updateEvent(
             @PathVariable Long userId,
             @PathVariable Long eventId,
-            @RequestBody UpdateEventUserRequest updateRequest) {
+            @Valid @RequestBody UpdateEventUserRequest updateRequest) {
 
         log.info("Request PATCH /users/{}/events/{} with update data : {}", userId, eventId, updateRequest);
 

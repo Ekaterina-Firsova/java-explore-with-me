@@ -44,7 +44,7 @@ public class AdminUserController {
 
     // POST /admin/users - Добавление нового пользователя
     @PostMapping
-    public ResponseEntity<UserDto> registerUser(@RequestBody @Validated UserDto newUser) {
+    public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserDto newUser) {
         log.info("Request POST /users with body : {}", newUser);
         UserDto createdUser = userService.createUser(newUser);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);

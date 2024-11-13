@@ -1,9 +1,8 @@
 package ru.practicum.ewm.dto;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,13 +26,14 @@ public class UpdateEventUserRequest {
     @Size(min = 20, max = 7000, message = "Description must be between 20 and 7000 characters.")
     private String description;
 
-    @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
-    private LocationDto location; // DTO для местоположения
+    private LocationDto location;
 
     private Boolean paid;
 
+    @Positive
     private Integer participantLimit;
 
     private Boolean requestModeration;

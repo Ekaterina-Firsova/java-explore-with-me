@@ -8,6 +8,7 @@ import ru.practicum.ewm.dto.enumerate.UserStateRequest;
 import ru.practicum.ewm.entity.ParticipationRequest;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ParticipationRequestRepository extends JpaRepository<ParticipationRequest, Long> {
 
@@ -37,4 +38,8 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
     );
 
     List<ParticipationRequest> findByEvent(Long eventId);
+
+    List<ParticipationRequest> findByRequester_Id(Long userId);
+
+    Optional<ParticipationRequest> findByIdAndRequester_Id(Long requestId, Long userId);
 }

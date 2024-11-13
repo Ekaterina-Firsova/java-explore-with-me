@@ -2,6 +2,7 @@ package ru.practicum.ewm.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,12 +48,16 @@ public class EventController {
             @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeEnd, // дата и время окончания диапазона поиска
             @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable, // поиск событий с доступными местами
             @RequestParam(required = false) String sort, // сортировка: по дате события или просмотрам
-            @RequestParam(required = false, defaultValue = "0") Integer from, // количество событий, которые нужно пропустить
-            @RequestParam(required = false, defaultValue = "10") Integer size, // количество событий в ответе
+            @RequestParam(required = false, defaultValue = "0") @Positive Integer from, // количество событий, которые нужно пропустить
+            @RequestParam(required = false, defaultValue = "10") @Positive Integer size, // количество событий в ответе
             HttpServletRequest request
     ) {
-        log.info("Request GET /events with parameters text: {}, categories: {}, paid: {}, rangeStart: {}, rangeEnd: {}, onlyAvailable: {}, sort: {}, from: {}, size: {}",
+        log.info("Request GET /events with parameters: text: {}, categories: {}, paid: {}, rangeStart: {}, rangeEnd: {}, onlyAvailable: {}, sort: {}, from: {}, size: {}",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+
+        if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
+            throw new IllegalArgumentException("rangeStart must be before rangeEnd.");
+        }
 
         List<EventShortDto> events = eventService.getFilteredEvents(
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size
@@ -83,6 +88,6 @@ public class EventController {
 
         statsClient.saveHit(endpointHitDto);
 
-        return ResponseEntity.ok(eventService.getEventByIdAndState(id, EventState.PUBLISHED));
+        return ResponseEntity.ok(eventService.getEventByIdAndState(id, EventState.PUBLISHED, request.getRemoteAddr()));
     }
 }

@@ -1,4 +1,5 @@
 package ru.practicum.ewm.controller.user;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +59,7 @@ public class UserRequestController {
     //Изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя
     @PatchMapping("/{userId}/events/{eventId}/requests")
     public ResponseEntity<EventRequestStatusUpdateResult> changeRequestStatus(
-            @RequestBody EventRequestStatusUpdateRequest updateRequest,
+            @Valid  @RequestBody EventRequestStatusUpdateRequest updateRequest,
             @PathVariable Long userId,
             @PathVariable Long eventId) {
         EventRequestStatusUpdateResult result = participationRequestService.updateRequestStatus(userId, eventId, updateRequest);
@@ -75,4 +76,22 @@ public class UserRequestController {
         return new ResponseEntity<>(createdRequest, HttpStatus.CREATED);
     }
 
+    //Получение информации о заявках текущего пользователя на участие в чужих событиях
+    @GetMapping("/{userId}/requests")
+    public ResponseEntity<List<ParticipationRequestDto>> getUserRequests(@PathVariable @NotNull Long userId) {
+        List<ParticipationRequestDto> requests = participationRequestService.getRequestsByUserId(userId);
+
+        return ResponseEntity.ok(requests);
+    }
+
+    //Отмена своего запроса на участие в событии
+    @PatchMapping("/{userId}/requests/{requestId}/cancel")
+    public ResponseEntity<ParticipationRequestDto> cancelRequest(
+            @PathVariable @NotNull Long userId,
+            @PathVariable @NotNull Long requestId) {
+
+        ParticipationRequestDto cancelledRequest = participationRequestService.cancelRequest(userId, requestId);
+
+        return ResponseEntity.ok(cancelledRequest);
+    }
 }

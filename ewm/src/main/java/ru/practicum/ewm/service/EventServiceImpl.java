@@ -20,12 +20,14 @@ import ru.practicum.ewm.dto.enumerate.EventState;
 import ru.practicum.ewm.dto.enumerate.UserStateAction;
 import ru.practicum.ewm.entity.Category;
 import ru.practicum.ewm.entity.Event;
+import ru.practicum.ewm.entity.EventView;
 import ru.practicum.ewm.entity.QEvent;
 import ru.practicum.ewm.entity.User;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.repository.EventRepository;
+import ru.practicum.ewm.repository.EventViewRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,6 +43,7 @@ public class EventServiceImpl implements EventService {
     private final QEvent qEvent = QEvent.event;
     private final UserService userService;
     private final CategoryService categoryService;
+    private final EventViewRepository eventViewRepository;
 
     @Override
     @Transactional
@@ -270,7 +273,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     // /events - получение всех опубликованных событий
-    public List<EventShortDto> getFilteredEvents(String text, List<Long> categories,Boolean paid,
+    public List<EventShortDto> getFilteredEvents(String text, List<Long> categories, Boolean paid,
                                                  LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                                  Boolean onlyAvailable, String sort, Integer from, Integer size) {
         if (rangeStart == null) {
@@ -307,7 +310,7 @@ public class EventServiceImpl implements EventService {
             builder.and(qEvent.confirmedRequests.lt(qEvent.participantLimit));
         }
 
-        if (sort.equalsIgnoreCase("EVENT_DATE")) {
+        if (sort == null || sort.equalsIgnoreCase("EVENT_DATE")) {
             pageable = PageRequest.of(from / size, size, Sort.by("eventDate").ascending());
         } else if (sort.equalsIgnoreCase("VIEWS")) {
             pageable = PageRequest.of(from / size, size, Sort.by("views").descending());
@@ -321,17 +324,23 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventFullDto getEventByIdAndState(Long id, EventState state) {
+    public EventFullDto getEventByIdAndState(Long id, EventState state, String ipAddress) {
         // /events/{id} - получение опубликованного события по id
 
         Event event = eventRepository.findByIdAndState(id, state)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + id + " was not found."));
 
-        // Увеличиваем счетчик просмотров на 1
-        if(event.getViews() == null) {
-            event.setViews(1);
-        } else {
-            event.setViews(event.getViews() + 1);
+        // Проверка на уникальность просмотра по IP
+        if (!eventViewRepository.existsByEventIdAndIpAddress(id, ipAddress)) {
+            // Сохраняем информацию о просмотре и увеличиваем счетчик
+            EventView view = new EventView();
+            view.setEventId(id);
+            view.setIpAddress(ipAddress);
+            eventViewRepository.save(view);
+
+            // Увеличиваем счетчик просмотров
+            event.setViews(event.getViews() == null ? 1 : event.getViews() + 1);
+            eventRepository.save(event);
         }
 
         eventRepository.save(event);

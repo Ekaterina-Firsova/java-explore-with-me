@@ -3,6 +3,7 @@ package ru.practicum.ewm.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import ru.practicum.ewm.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.dto.EventRequestStatusUpdateResult;
@@ -128,7 +129,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new ConflictException("Cannot request to join an unpublished event.");
         }
 
-        // Проверка: достигнут ли лимит запросов на участие
+        // достигнут ли лимит запросов на участие
         if (event.getParticipantLimit() > 0 &&
                 requestRepository.countByEventAndStatus(eventId, UserStateRequest.CONFIRMED) >= event.getParticipantLimit()) {
             throw new ConflictException("The participant limit has been reached.");
@@ -137,14 +138,40 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         // Определение статуса заявки
         UserStateRequest status = event.getRequestModeration() ? UserStateRequest.PENDING : UserStateRequest.CONFIRMED;
 
-        // Создание новой заявки
         ParticipationRequest newRequest = new ParticipationRequest();
         newRequest.setEvent(event.getId());
         newRequest.setRequester(user);
         newRequest.setStatus(status);
-        //newRequest.setCreated(LocalDateTime.now());
 
         return ParticipationRequestMapper.toDto(requestRepository.save(newRequest));
-        //return null;
+    }
+
+    @Override
+    //Получение информации о заявках текущего пользователя на участие в чужих событиях
+    // ("/{userId}/requests")
+    public List<ParticipationRequestDto> getRequestsByUserId(Long userId) {
+        // Проверка на существование пользователя
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        List<ParticipationRequest> requests = requestRepository.findByRequester_Id(userId);
+        return requests.stream()
+                .map(ParticipationRequestMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    //Отмена своего запроса на участие в событии "/{userId}/requests/{requestId}/cancel"
+    public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        ParticipationRequest request = requestRepository.findByIdAndRequester_Id(requestId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+
+        request.setStatus(UserStateRequest.CANCELED);
+        requestRepository.save(request);
+
+        return ParticipationRequestMapper.toDto(request);
     }
 }

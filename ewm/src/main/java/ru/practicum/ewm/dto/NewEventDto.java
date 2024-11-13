@@ -33,22 +33,14 @@ public class NewEventDto {
     @NotNull
     private LocationDto location; // Локация события
 
-    //@Builder.Default
     private Boolean paid = false; // Нужно ли оплачивать участие в событии
 
     @Min(0)
-    //@Builder.Default
     private Integer participantLimit = 0; // Ограничение на количество участников. 0-ограничений нет
 
-    //@Builder.Default
     private Boolean requestModeration = true; // Нужна ли пре-модерация заявок на участие
 
     @NotBlank
     @Size(min = 3, max = 120)
     private String title; // Заголовок события
 }
-
-//public class NewEventDto {
-//
-//    private Integer category; // ID категории к которой относится событие
-//}

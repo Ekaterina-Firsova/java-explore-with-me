@@ -33,5 +33,5 @@ public interface EventService {
     List<EventShortDto> getFilteredEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
                                           LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size);
 
-    EventFullDto getEventByIdAndState(@NotNull Long id, @NotNull EventState state);
+    EventFullDto getEventByIdAndState(@NotNull Long id, @NotNull EventState state, @NotNull String ipAddress);
 }

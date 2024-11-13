@@ -11,21 +11,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
-@Table(name = "categories")
+@Table(name = "event_views")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Category {
+public class EventView {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String name;
+    @Column(name = "event_id", nullable = false)
+    private Long eventId;
 
-    private String description;
+    @Column(name = "ip_address", nullable = false)
+    private String ipAddress;
+
 }

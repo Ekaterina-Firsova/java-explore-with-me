@@ -1,5 +1,6 @@
 package ru.practicum.ewm.controller.admin;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,7 @@ public class AdminEventController {
     // редактирование события
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventFullDto> updateEvent(
-            @RequestBody UpdateEventAdminRequest updateRequest,
+            @Valid @RequestBody UpdateEventAdminRequest updateRequest,
             @PathVariable Long eventId) {
 
         log.info("Request PATCH /admin/events/{} with data: {}", eventId, updateRequest);
