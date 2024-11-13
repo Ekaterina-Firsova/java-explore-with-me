@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,11 @@ import ru.practicum.ewm.dto.EventFullDto;
 import ru.practicum.ewm.dto.EventShortDto;
 import ru.practicum.ewm.dto.NewEventDto;
 
+import ru.practicum.ewm.dto.ParticipationRequestDto;
+import ru.practicum.ewm.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.exception.ApiError;
+import ru.practicum.ewm.exception.ConflictException;
+import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.service.EventService;
 
 import java.time.LocalDateTime;
@@ -34,6 +39,7 @@ public class UserEventController {
 
     private final EventService eventService;
 
+    //добавление нового события
     @PostMapping("/{userId}/events")
     public ResponseEntity<?> addEvent(
                         @RequestBody NewEventDto newEventDto,
@@ -57,6 +63,7 @@ public class UserEventController {
         return new ResponseEntity<>(eventFullDto, HttpStatus.CREATED);
     }
 
+    //получение события, добавленного пользователем
     @GetMapping("/{userId}/events")
     public ResponseEntity<?> getEvents(
             @PathVariable @NotNull Long userId,
@@ -65,33 +72,36 @@ public class UserEventController {
 
         log.info("Request GET /users/{}/events with params: from={}, size={}", userId, from, size);
 
-        // Валидация параметров
         if (from < 0 || size <= 0) {
-            ApiError error = new ApiError(
-                    HttpStatus.BAD_REQUEST,
-                    "Invalid parameters",
-                    "The 'from' parameter must be >= 0 and 'size' must be > 0."
-            );
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+            throw new ConflictException("The 'from' parameter must be >= 0 and 'size' must be > 0");
         }
 
-        try {
-            List<EventShortDto> events = eventService.getEvents(userId, from, size);
+        List<EventShortDto> events = eventService.getEvents(userId, from, size);
+        return new ResponseEntity<>(events, HttpStatus.OK);
+    }
 
-            // Если событий нет, возвращаем пустой список
-            if (events.isEmpty()) {
-                return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
-            }
+    // получение полной информации о событии добавленной текущем пользователем
+    @GetMapping("/{userId}/events/{eventId}")
+    public ResponseEntity<EventFullDto> getEvent(
+            @PathVariable Long userId,
+            @PathVariable Long eventId) {
 
-            return new ResponseEntity<>(events, HttpStatus.OK);
-        } catch (Exception e) {
-            // Если произошла ошибка на уровне сервиса
-            ApiError error = new ApiError(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Error fetching events",
-                    e.getMessage()
-            );
-            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        log.info("Request GET /users/{}/events/{}", userId, eventId);
+
+        EventFullDto event = eventService.getEvent(userId, eventId);
+        return new ResponseEntity<>(event, HttpStatus.OK);
+    }
+
+    // изменение события
+    @PatchMapping("/{userId}/events/{eventId}")
+    public ResponseEntity<?> updateEvent(
+            @PathVariable Long userId,
+            @PathVariable Long eventId,
+            @RequestBody UpdateEventUserRequest updateRequest) {
+
+        log.info("Request PATCH /users/{}/events/{} with update data : {}", userId, eventId, updateRequest);
+
+        EventFullDto updatedEvent = eventService.updateEvent(userId, eventId, updateRequest);
+        return new ResponseEntity<>(updatedEvent, HttpStatus.OK);
     }
 }

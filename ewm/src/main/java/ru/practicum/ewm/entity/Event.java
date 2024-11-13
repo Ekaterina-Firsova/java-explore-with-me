@@ -2,6 +2,7 @@ package ru.practicum.ewm.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -17,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.ewm.dto.LocationDto;
 import ru.practicum.ewm.dto.enumerate.EventState;
 
 import java.time.LocalDateTime;
@@ -56,10 +58,6 @@ public class Event {
     @JoinColumn(name = "initiator_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_events_users"))
     private User initiator;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_events_locations"))
-    private Location location;
-
     @Column(nullable = false)
     private Boolean paid;
 
@@ -81,4 +79,7 @@ public class Event {
 
     @Column(nullable = false)
     private Integer views = 0;
+
+    @Embedded
+    private LocationDto locationDto;
 }

@@ -6,11 +6,11 @@ CREATE TABLE if not exists "users" (
     updated_at timestamp WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE TABLE if not exists locations (
-    id SERIAL PRIMARY KEY, -- Уникальный идентификатор местоположения
-    lat DOUBLE PRECISION NOT NULL, -- Широта
-    lon DOUBLE PRECISION NOT NULL -- Долгота
-);
+--CREATE TABLE if not exists locations (
+--    id SERIAL PRIMARY KEY, -- Уникальный идентификатор местоположения
+--    lat DOUBLE PRECISION NOT NULL, -- Широта
+--    lon DOUBLE PRECISION NOT NULL -- Долгота
+--);
 
 --CREATE TABLE if not exists api_errors (
 --    id SERIAL PRIMARY KEY, -- Уникальный идентификатор ошибки
@@ -58,19 +58,21 @@ CREATE TABLE if not exists events (
     id SERIAL PRIMARY KEY, -- Уникальный идентификатор события
     annotation TEXT NOT NULL, -- Краткое описание события
     category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL, -- Категория события
-    confirmed_requests INTEGER DEFAULT 0, -- Количество одобренных заявок
+    confirmed_requests INTEGER DEFAULT 0 NOT NULL, -- Количество одобренных заявок
     created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Дата и время создания события
     description TEXT, -- Полное описание события
     event_date TIMESTAMP NOT NULL, -- Дата и время проведения события
     initiator_id INTEGER REFERENCES "users"(id) ON DELETE SET NULL, -- Инициатор события
-    location_id INTEGER REFERENCES locations(id) ON DELETE SET NULL, -- Местоположение события
     paid BOOLEAN NOT NULL, -- Нужно ли оплачивать участие
     participant_limit INTEGER DEFAULT 0, -- Лимит участников, 0 = без ограничений
     published_on TIMESTAMP, -- Дата и время публикации события
     request_moderation BOOLEAN DEFAULT TRUE, -- Флаг необходимости премодерации заявок
     state VARCHAR(20) CHECK (state IN ('PENDING', 'PUBLISHED', 'CANCELED')), -- Статус жизненного цикла события
     title VARCHAR(255) NOT NULL, -- Заголовок события
-    views INTEGER DEFAULT 0 -- Количество просмотров
+    views INTEGER DEFAULT 0, -- Количество просмотров
+    --location_id INTEGER REFERENCES locations(id) ON DELETE SET NULL, -- Местоположение события
+    lat DOUBLE PRECISION NOT NULL, -- Широта
+    lon DOUBLE PRECISION NOT NULL -- Долгота
 );
 
 -- Промежуточная таблица для связи "многие ко многим" между compilations и events
@@ -82,38 +84,34 @@ CREATE TABLE if not exists compilation_events (
 );
 
 
-CREATE TABLE if not exists event_requests (
-    id SERIAL PRIMARY KEY, -- Уникальный идентификатор запроса на участие
-    user_id INTEGER NOT NULL REFERENCES "users"(id), -- Идентификатор пользователя
-    event_id INTEGER NOT NULL REFERENCES events(id), -- Идентификатор события
-    status VARCHAR(20) CHECK (status IN ('CONFIRMED', 'REJECTED', 'PENDING')) DEFAULT 'PENDING', -- Статус запроса
-    requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Время создания запроса
-);
-
-CREATE TABLE if not exists event_request_status_update_requests (
-    id SERIAL PRIMARY KEY, -- Уникальный идентификатор запроса на обновление статуса
-    request_id INTEGER NOT NULL REFERENCES event_requests(id) ON DELETE CASCADE, -- Идентификатор запроса на участие
-    status VARCHAR(20) NOT NULL CHECK (status IN ('CONFIRMED', 'REJECTED')), -- Новый статус запроса на участие
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Время обновления статуса
-);
-
-CREATE TABLE if not exists event_request_status_update_results (
-    id SERIAL PRIMARY KEY, -- Уникальный идентификатор результата обновления статуса
-    confirmed_request_id INTEGER REFERENCES event_requests(id) ON DELETE SET NULL, -- Идентификатор подтвержденного запроса на участие
-    rejected_request_id INTEGER REFERENCES event_requests(id) ON DELETE SET NULL -- Идентификатор отклоненного запроса на участие
-);
+--CREATE TABLE if not exists event_requests (
+--    id SERIAL PRIMARY KEY, -- Уникальный идентификатор запроса на участие
+--    user_id INTEGER NOT NULL REFERENCES "users"(id), -- Идентификатор пользователя
+--    event_id INTEGER NOT NULL REFERENCES events(id), -- Идентификатор события
+--    status VARCHAR(20) CHECK (status IN ('CONFIRMED', 'REJECTED', 'PENDING')) DEFAULT 'PENDING', -- Статус запроса
+--    requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Время создания запроса
+--);
 
 CREATE TABLE if not exists participation_requests (
     id SERIAL PRIMARY KEY, -- Уникальный идентификатор заявки
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Дата и время создания заявки
-    event INTEGER REFERENCES events(id) ON DELETE CASCADE, -- Идентификатор события
+    event_id INTEGER REFERENCES events(id) ON DELETE CASCADE, -- Идентификатор события
     requester INTEGER REFERENCES "users"(id) ON DELETE CASCADE, -- Идентификатор пользователя, отправившего заявку
     status VARCHAR(20) CHECK (status IN ('PENDING', 'CONFIRMED', 'REJECTED')) DEFAULT 'PENDING' -- Статус заявки
 );
 
-CREATE TABLE if not exists locations (
-    id SERIAL PRIMARY KEY, -- Уникальный идентификатор местоположения
-    lat FLOAT NOT NULL, -- Широта
-    lon FLOAT NOT NULL -- Долгота
-);
+--CREATE TABLE if not exists event_request_status_update_requests (
+--    id SERIAL PRIMARY KEY, -- Уникальный идентификатор запроса на обновление статуса
+--    request_id INTEGER NOT NULL REFERENCES event_requests(id) ON DELETE CASCADE, -- Идентификатор запроса на участие
+--    status VARCHAR(20) NOT NULL CHECK (status IN ('CONFIRMED', 'REJECTED')), -- Новый статус запроса на участие
+--    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Время обновления статуса
+--);
+
+--CREATE TABLE if not exists event_request_status_update_results (
+--    id SERIAL PRIMARY KEY, -- Уникальный идентификатор результата обновления статуса
+--    confirmed_request_id INTEGER REFERENCES event_requests(id) ON DELETE SET NULL, -- Идентификатор подтвержденного запроса на участие
+--    rejected_request_id INTEGER REFERENCES event_requests(id) ON DELETE SET NULL -- Идентификатор отклоненного запроса на участие
+--);
+
+
 

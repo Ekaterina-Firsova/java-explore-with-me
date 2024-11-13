@@ -1,5 +1,6 @@
 package ru.practicum.ewm.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,7 @@ public class EventShortDto {
 
     private Integer confirmedRequests; // Количество одобренных заявок
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate; // Дата и время события
 
     private UserShortDto initiator; // Инициатор события (краткая информация о пользователе)

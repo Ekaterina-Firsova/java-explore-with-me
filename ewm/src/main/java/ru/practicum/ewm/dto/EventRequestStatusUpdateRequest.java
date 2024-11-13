@@ -1,20 +1,23 @@
 package ru.practicum.ewm.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.ewm.dto.enumerate.UserStateRequest;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Embeddable
-public class LocationDto {
-    @NotNull
-    private Double lat;
+@Builder
+public class EventRequestStatusUpdateRequest {
 
     @NotNull
-    private Double lon;
+    private List<Long> requestIds;
+
+    @NotNull
+    private UserStateRequest status;
 }
