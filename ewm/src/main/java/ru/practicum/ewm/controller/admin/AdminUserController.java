@@ -3,6 +3,7 @@ package ru.practicum.ewm.controller.admin;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +35,8 @@ public class AdminUserController {
     @GetMapping
     public ResponseEntity<List<UserDto>> getUsers(
             @RequestParam(required = false) List<Long> ids,
-            @RequestParam(required = false, defaultValue = "0") @Min(0) Integer from,
-            @RequestParam(required = false, defaultValue = "10") @Min(1) Integer size) {
+            @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(required = false, defaultValue = "10") @Positive Integer size) {
         log.info("Request GET /users with parameters ids: {}, from: {}, size: {}", ids, from, size);
 
         List<UserDto> users = userService.getUsers(ids, from, size);

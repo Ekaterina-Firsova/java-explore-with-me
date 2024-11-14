@@ -2,6 +2,8 @@ package ru.practicum.ewm.controller.user;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import ru.practicum.ewm.dto.NewEventDto;
 import ru.practicum.ewm.dto.ParticipationRequestDto;
 import ru.practicum.ewm.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.exception.ApiError;
+import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.service.EventService;
@@ -41,7 +44,7 @@ public class UserEventController {
 
     //добавление нового события
     @PostMapping("/{userId}/events")
-    public ResponseEntity<?> addEvent(
+    public ResponseEntity<EventFullDto> addEvent(
                         @Valid @RequestBody NewEventDto newEventDto,
                         @PathVariable Long userId) {
 
@@ -49,26 +52,20 @@ public class UserEventController {
         // Проверка на время начала события - не менее чем через два часа от текущего времени
         LocalDateTime minEventDate = LocalDateTime.now().plusHours(2);
         if (newEventDto.getEventDate().isBefore(minEventDate)) {
-            ApiError error = new ApiError(
-                    HttpStatus.CONFLICT,
-                    "Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value: "
-                            + newEventDto.getEventDate(),
-                    "For the requested operation the conditions are not met."
-            );
-            return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+            throw new BadRequestException("Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value: "
+                    + newEventDto.getEventDate());
         }
-
         EventFullDto eventFullDto = eventService.addEvent(userId, newEventDto);
 
-        return new ResponseEntity<>(eventFullDto, HttpStatus.CREATED);
+        return new ResponseEntity<EventFullDto>(eventFullDto, HttpStatus.CREATED);
     }
 
     //получение события, добавленного пользователем
     @GetMapping("/{userId}/events")
     public ResponseEntity<?> getEvents(
             @PathVariable @NotNull Long userId,
-            @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "10") @Positive Integer size) {
 
         log.info("Request GET /users/{}/events with params: from={}, size={}", userId, from, size);
 

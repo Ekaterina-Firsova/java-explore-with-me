@@ -1,7 +1,6 @@
 package ru.practicum.ewm.service;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -9,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 import ru.practicum.ewm.dto.EventFullDto;
 import ru.practicum.ewm.dto.EventShortDto;
 import ru.practicum.ewm.dto.NewEventDto;
@@ -25,6 +23,7 @@ import ru.practicum.ewm.entity.QEvent;
 import ru.practicum.ewm.entity.User;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
+import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.repository.EventRepository;
 import ru.practicum.ewm.repository.EventViewRepository;
@@ -49,32 +48,38 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto updateEvent(Long eventId, UpdateEventAdminRequest updateRequest) {
         //редактирование события администратором /admin/events/{eventId}
+
+        if (updateRequest.getEventDate() != null && updateRequest.getEventDate().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Дата начала события должна быть позже текущей");
+        }
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
 
-        if (updateRequest.getStateAction().equals(AdminStateAction.PUBLISH_EVENT)) {
+        if (updateRequest.getStateAction() != null && updateRequest.getStateAction().equals(AdminStateAction.PUBLISH_EVENT)) {
             // Проверяем дату начала
             if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
                 throw new ConflictException("Дата начала события должна быть не ранее чем за час от даты публикации");
             }
         }
 
-        AdminStateAction adminAction = updateRequest.getStateAction();
+        if (updateRequest.getStateAction() != null) {
+            AdminStateAction adminAction = updateRequest.getStateAction();
 
-        // изменение состояния события
-        if (adminAction.equals(AdminStateAction.PUBLISH_EVENT)) {
-            if (event.getState().equals(EventState.PUBLISHED)) {
-                throw new ConflictException("Cannot publish the event because it's already published");
+            // изменение состояния события
+            if (adminAction.equals(AdminStateAction.PUBLISH_EVENT)) {
+                if (event.getState().equals(EventState.PUBLISHED)) {
+                    throw new ConflictException("Cannot publish the event because it's already published");
+                }
+                if (!event.getState().equals(EventState.PENDING)) {
+                    throw new ConflictException("Event must be in PENDING state to be published");
+                }
+                event.setState(EventState.PUBLISHED);
+            } else if (adminAction.equals(AdminStateAction.REJECT_EVENT)) {
+                if (event.getState().equals(EventState.PUBLISHED)) {
+                    throw new ConflictException("Cannot reject the event because it's already published");
+                }
+                event.setState(EventState.CANCELED);
             }
-            if (!event.getState().equals(EventState.PENDING)) {
-                throw new ConflictException("Event must be in PENDING state to be published");
-            }
-            event.setState(EventState.PUBLISHED);
-        } else if (adminAction.equals(AdminStateAction.REJECT_EVENT)) {
-            if (event.getState().equals(EventState.PUBLISHED)) {
-                throw new ConflictException("Cannot reject the event because it's already published");
-            }
-            event.setState(EventState.CANCELED);
         }
 
         if (updateRequest.getTitle() != null) {
@@ -109,9 +114,9 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(eventRepository.save(event));
     }
 
+    //просмотр события "/admin/events"
     @Override
     public List<EventFullDto> getEvents(
-            //просмотр события "/admin/events"
             List<Long> users, List<String> states, List<Long> categories,
             LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
 
@@ -205,17 +210,18 @@ public class EventServiceImpl implements EventService {
     @Override
     // Изменение события /users/{userId}/events/{eventId}
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest updateRequest) {
-        Event event = eventRepository.findByInitiatorIdAndId(userId, eventId)
-                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found."));
-
-        if (event.getState() != EventState.PENDING && event.getState() != EventState.CANCELED) {
-            throw new IllegalStateException("Only pending or canceled events can be changed");
-        }
 
         // Проверяем дату события
         LocalDateTime minEventDate = LocalDateTime.now().plusHours(2);
         if (updateRequest.getEventDate() != null && updateRequest.getEventDate().isBefore(minEventDate)) {
-            throw new IllegalStateException("Event date must be at least two hours from now.");
+            throw new BadRequestException("Event date must be at least two hours from now.");
+        }
+
+        Event event = eventRepository.findByInitiatorIdAndId(userId, eventId)
+                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found."));
+
+        if (event.getState() != EventState.PENDING && event.getState() != EventState.CANCELED) {
+            throw new ConflictException("Only pending or canceled events can be changed");
         }
 
         if (updateRequest.getAnnotation() != null) {

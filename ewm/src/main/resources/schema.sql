@@ -1,7 +1,7 @@
 CREATE TABLE if not exists "users" (
     id SERIAL PRIMARY KEY, -- Уникальный идентификатор пользователя
-    email VARCHAR(255) NOT NULL UNIQUE, -- Почтовый адрес пользователя
-    name VARCHAR(100) NOT NULL, -- Имя пользователя
+    email VARCHAR(254) NOT NULL UNIQUE, -- Почтовый адрес пользователя
+    name VARCHAR(250) NOT NULL, -- Имя пользователя
     created_at timestamp  WITHOUT TIME ZONE NOT NULL,
     updated_at timestamp WITHOUT TIME ZONE NOT NULL
 );

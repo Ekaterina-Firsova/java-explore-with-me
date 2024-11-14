@@ -2,6 +2,7 @@ package ru.practicum.ewm.controller.admin;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -42,7 +43,7 @@ public class AdminEventController {
             @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeStart, //дата и время не раньше которых должно произойти событие
             @RequestParam(required = false)
             @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeEnd, //дата и время не позже которых должно произойти событие
-            @RequestParam(required = false, defaultValue = "0") @Min(0) Integer from, //количество событий, которые нужно пропустить для формирования текущего набора
+            @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer from, //количество событий, которые нужно пропустить для формирования текущего набора
             @RequestParam(required = false, defaultValue = "10") @Min(1) Integer size //количество событий в наборе
     ) {
         log.info("Request GET /admin/events with parameters user: {}, states: {}, categories: {}, rangeStart: {}, rangeEnd: {}, from: {}, size: {}",

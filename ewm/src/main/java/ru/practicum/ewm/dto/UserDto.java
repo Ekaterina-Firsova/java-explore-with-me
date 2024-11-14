@@ -19,10 +19,10 @@ public class UserDto {
 
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Неверный формат email")
-    @Size(max = 255, message = "Email не может превышать 255 символов")
+    @Size(min = 6, max = 254, message = "Email не может превышать 254 символов")
     private String email; // Почтовый адрес пользователя
 
     @NotBlank(message = "Имя не может быть пустым")
-    @Size(min = 1, max = 100, message = "Имя должно содержать от 1 до 100 символов")
+    @Size(min = 2, max = 250, message = "Имя должно содержать от 2 до 250 символов")
     private String name; // Имя пользователя
 }

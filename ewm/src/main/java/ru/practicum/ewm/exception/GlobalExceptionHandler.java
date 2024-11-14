@@ -65,6 +65,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiError> handleCategoryNotFound(BadRequestException ex) {
+        ApiError apiError = new ApiError(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                "Your request is very, very bad"
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
 //    @ExceptionHandler(Exception.class)
 //    public ResponseEntity<ApiError> handleException(Exception ex) {
 //        ApiError apiError = new ApiError(

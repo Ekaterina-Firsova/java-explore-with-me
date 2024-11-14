@@ -82,6 +82,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                     // Достигнут лимит участников
                     request.setStatus(UserStateRequest.REJECTED);
                     rejectedRequests.add(request);
+                    throw new ConflictException("The participant limit has been reached. Request rejected.");
                 } else {
                     // Подтверждаем заявку и увеличиваем счетчик подтвержденных заявок
                     request.setStatus(UserStateRequest.CONFIRMED);
@@ -135,8 +136,13 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new ConflictException("The participant limit has been reached.");
         }
 
-        // Определение статуса заявки
-        UserStateRequest status = event.getRequestModeration() ? UserStateRequest.PENDING : UserStateRequest.CONFIRMED;
+        // Определяем каким должен быть статус заявки
+        UserStateRequest status;
+        if (event.getRequestModeration() && event.getParticipantLimit() > 0) {
+            status = UserStateRequest.PENDING;
+        } else {
+            status = UserStateRequest.CONFIRMED;
+        }
 
         ParticipationRequest newRequest = new ParticipationRequest();
         newRequest.setEvent(event.getId());

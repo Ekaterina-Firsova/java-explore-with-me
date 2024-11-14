@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.ewm.dto.UserDto;
 import ru.practicum.ewm.entity.User;
+import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.mapper.CategoryMapper;
 import ru.practicum.ewm.mapper.UserMapper;
@@ -49,46 +50,13 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toListUserDto(pagedUsers);
     }
 
-
-//    @Override
-//    public List<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
-//
-//        //final PageRequest pageRequest = PageRequest.of(from / size, size);
-//        final Pageable pageable = PageRequest.of(from / size, size);
-//        List<User> user;
-//
-//        if (ids == null || ids.isEmpty()) {
-//            user = repository.findAll(pageable).getContent();
-//        } else {
-//            user = repository.findByIdIn(ids, pageable).getContent();
-//        }
-//
-//        return UserMapper.toListUserDto(user);
-////        return user.stream()
-////                .skip(from) // Пропускаем первые `from` записей
-////                .limit(size) // Ограничиваем результирующий список до `size` записей
-////                .map(UserMapper::toUserDto)
-////                .collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public List<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
-//
-//
-////        if (ids == null || ids.isEmpty()) {
-////            user = repository.findAll(pageable).getContent();
-////        } else {
-////            user = repository.findAllByIdIn(ids, pageable).getContent();
-////        }
-//
-//        // Теперь возвращаем подмножество из полученного списка, начиная с `from`
-//        return UserMapper.toListUserDto(repository.findUsersByIds(ids, from, size));
-//
-//    }
-
     @Transactional
     @Override
     public UserDto createUser(UserDto newUser) {
+         if (repository.existsByEmail(newUser.getEmail())) {
+            throw new ConflictException("Email already in use");
+        }
+
         return UserMapper.toUserDto(repository.save(UserMapper.toUser(newUser)));
     }
 

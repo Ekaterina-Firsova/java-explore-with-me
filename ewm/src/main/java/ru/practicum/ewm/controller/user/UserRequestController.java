@@ -63,6 +63,12 @@ public class UserRequestController {
             @PathVariable Long userId,
             @PathVariable Long eventId) {
         EventRequestStatusUpdateResult result = participationRequestService.updateRequestStatus(userId, eventId, updateRequest);
+
+//        // Проверка на наличие отклоненных заявок
+//        if (result.getRejectedRequests() != null && !result.getRejectedRequests().isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(result);
+//        }
+
         return ResponseEntity.ok(result);
     }
 

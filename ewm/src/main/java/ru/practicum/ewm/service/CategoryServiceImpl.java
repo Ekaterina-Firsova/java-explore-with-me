@@ -14,6 +14,7 @@ import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.mapper.CategoryMapper;
 import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.repository.CategoryRepository;
+import ru.practicum.ewm.repository.EventRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
 
     // Добавление новой категории
     @Transactional
@@ -68,10 +70,9 @@ public class CategoryServiceImpl implements CategoryService {
         return new CategoryDto(updatedCategory.getId(), updatedCategory.getName());
     }
 
-    // Проверка, связана ли категория с событиями
     private boolean categoryHasEvents(Category category) {
-        // Здесь добавьте логику проверки на связь категории с событиями, например, через дополнительный метод репозитория
-        return false; // Временно возвращаем false для примера
+        // Проверяем, есть ли хотя бы одно событие с данной категорией
+        return eventRepository.existsByCategory(category);
     }
 
     @Override

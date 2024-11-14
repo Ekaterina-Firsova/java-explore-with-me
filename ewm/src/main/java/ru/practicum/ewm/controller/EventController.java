@@ -3,6 +3,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.dto.EventFullDto;
 import ru.practicum.ewm.dto.EventShortDto;
 import ru.practicum.ewm.dto.enumerate.EventState;
+import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.service.EventService;
 
 
@@ -48,7 +50,7 @@ public class EventController {
             @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeEnd, // дата и время окончания диапазона поиска
             @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable, // поиск событий с доступными местами
             @RequestParam(required = false) String sort, // сортировка: по дате события или просмотрам
-            @RequestParam(required = false, defaultValue = "0") @Positive Integer from, // количество событий, которые нужно пропустить
+            @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer from, // количество событий, которые нужно пропустить
             @RequestParam(required = false, defaultValue = "10") @Positive Integer size, // количество событий в ответе
             HttpServletRequest request
     ) {
@@ -56,7 +58,7 @@ public class EventController {
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
 
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
-            throw new IllegalArgumentException("rangeStart must be before rangeEnd.");
+            throw new BadRequestException("rangeStart must be before rangeEnd.");
         }
 
         List<EventShortDto> events = eventService.getFilteredEvents(

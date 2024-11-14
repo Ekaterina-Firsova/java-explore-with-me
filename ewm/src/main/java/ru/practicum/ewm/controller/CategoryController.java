@@ -1,6 +1,8 @@
 package ru.practicum.ewm.controller;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +29,8 @@ public class CategoryController {
 
     @GetMapping
     public ResponseEntity<List<CategoryDto>> getCategories(
-            @RequestParam(defaultValue = "0") @Min(0) int from,
-            @RequestParam(defaultValue = "10") @Min(1) int size) {
+            @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+            @RequestParam(defaultValue = "10") @Positive int size) {
 
         log.info("Request GET /categories with from: {} and size: {}", from, size);
 
