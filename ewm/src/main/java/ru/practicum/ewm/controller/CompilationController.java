@@ -1,7 +1,6 @@
 package ru.practicum.ewm.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,12 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.ewm.dto.CategoryDto;
 import ru.practicum.ewm.dto.CompilationDto;
 import ru.practicum.ewm.dto.NewCompilationDto;
 import ru.practicum.ewm.dto.UpdateCompilationRequest;
-import ru.practicum.ewm.mapper.CategoryMapper;
-import ru.practicum.ewm.service.CategoryService;
+
 import ru.practicum.ewm.service.CompilationService;
 
 import java.util.List;
@@ -48,7 +45,7 @@ public class CompilationController {
 
         compilationService.deleteCompilation(compId);
 
-        return ResponseEntity.noContent().build(); // Возвращаем 204 No Content, если удаление прошло успешно
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/admin/compilations/{compId}")
@@ -59,7 +56,7 @@ public class CompilationController {
 
         CompilationDto updatedCompilation = compilationService.updateCompilation(compId, updateCompilationRequest);
 
-        return ResponseEntity.ok(updatedCompilation); // Возвращаем 200 OK с обновленными данными
+        return ResponseEntity.ok(updatedCompilation);
     }
 
     @GetMapping("/compilations")
