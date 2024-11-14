@@ -6,7 +6,6 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.dto.EventFullDto;
 import ru.practicum.ewm.dto.UpdateEventAdminRequest;
-import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.service.EventService;
 
 import java.time.LocalDateTime;
@@ -65,24 +63,5 @@ public class AdminEventController {
         EventFullDto updatedEvent = eventService.updateEvent(eventId, updateRequest);
 
         return ResponseEntity.ok(updatedEvent);
-//        try {
-//            // Логика обновления события
-//            EventFullDto updatedEvent = eventService.updateEvent(eventId, updateRequest);
-//
-//            // Если событие успешно обновлено, возвращаем его
-//            return ResponseEntity.ok(updatedEvent);
-//        } catch (NotFoundException e) {
-//            log.error("Event with id={} not found", eventId);
-//            // Событие не найдено, возвращаем 404
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(new ApiError("NOT_FOUND", "The required object was not found.",
-//                            String.format("Event with id=%d was not found", eventId)));
-//        } catch (EventStateConflictException e) {
-//            log.error("Conflict when updating event with id={} : {}", eventId, e.getMessage());
-//            // Ошибка из-за некорректного состояния события, возвращаем 409
-//            return ResponseEntity.status(HttpStatus.CONFLICT)
-//                    .body(new ApiError("FORBIDDEN", "For the requested operation the conditions are not met.",
-//                            e.getMessage()));
-//        }
     }
 }

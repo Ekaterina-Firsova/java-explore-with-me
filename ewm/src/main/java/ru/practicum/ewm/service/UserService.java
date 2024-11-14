@@ -6,7 +6,6 @@ import ru.practicum.ewm.dto.UserDto;
 import ru.practicum.ewm.entity.User;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
 

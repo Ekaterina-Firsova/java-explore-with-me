@@ -1,6 +1,5 @@
 package ru.practicum.ewm.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

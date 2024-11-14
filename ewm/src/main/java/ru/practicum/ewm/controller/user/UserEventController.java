@@ -21,16 +21,12 @@ import ru.practicum.ewm.dto.EventFullDto;
 import ru.practicum.ewm.dto.EventShortDto;
 import ru.practicum.ewm.dto.NewEventDto;
 
-import ru.practicum.ewm.dto.ParticipationRequestDto;
 import ru.practicum.ewm.dto.UpdateEventUserRequest;
-import ru.practicum.ewm.exception.ApiError;
 import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.exception.ConflictException;
-import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.service.EventService;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -45,8 +41,8 @@ public class UserEventController {
     //добавление нового события
     @PostMapping("/{userId}/events")
     public ResponseEntity<EventFullDto> addEvent(
-                        @Valid @RequestBody NewEventDto newEventDto,
-                        @PathVariable Long userId) {
+            @Valid @RequestBody NewEventDto newEventDto,
+            @PathVariable Long userId) {
 
         log.info("Request POST /users/{}/events with body : {}", userId, newEventDto);
         // Проверка на время начала события - не менее чем через два часа от текущего времени
@@ -57,7 +53,7 @@ public class UserEventController {
         }
         EventFullDto eventFullDto = eventService.addEvent(userId, newEventDto);
 
-        return new ResponseEntity<EventFullDto>(eventFullDto, HttpStatus.CREATED);
+        return new ResponseEntity<>(eventFullDto, HttpStatus.CREATED);
     }
 
     //получение события, добавленного пользователем

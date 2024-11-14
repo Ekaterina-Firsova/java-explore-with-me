@@ -15,7 +15,6 @@ public class CompilationMapper {
     public static Compilation toCompilation(NewCompilationDto newCompilationDto, List<Event> events) {
         Compilation compilation = new Compilation();
 
-        // Преобразуем события (id) в объекты Event
         Set<Event> compilationEvents = events.stream()
                 .filter(event -> newCompilationDto.getEvents().contains(event.getId()))
                 .collect(Collectors.toSet());
@@ -27,7 +26,6 @@ public class CompilationMapper {
         return compilation;
     }
 
-    // Преобразование Compilation в CompilationDto
     public static CompilationDto toCompilationDto(Compilation compilation) {
         CompilationDto compilationDto = new CompilationDto();
 
@@ -35,7 +33,7 @@ public class CompilationMapper {
         compilationDto.setPinned(compilation.getPinned());
         compilationDto.setTitle(compilation.getTitle());
 
-         List<EventShortDto> eventShortDtos = compilation.getEvents().stream()
+        List<EventShortDto> eventShortDtos = compilation.getEvents().stream()
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
 

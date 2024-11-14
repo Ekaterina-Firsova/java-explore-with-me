@@ -30,7 +30,6 @@ public class UpdateEventAdminRequest {
 
     private LocationDto location; // Новое местоположение (ссылка на LocationDto)
 
-    //@NotNull(message = "Флаг платности не может быть null")
     private Boolean paid; // Платное ли событие
 
     @Min(value = 0, message = "Лимит участников должен быть положительным числом")

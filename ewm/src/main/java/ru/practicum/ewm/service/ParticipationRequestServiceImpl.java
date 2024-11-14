@@ -3,8 +3,6 @@ package ru.practicum.ewm.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import ru.practicum.ewm.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.dto.EventRequestStatusUpdateResult;
 import ru.practicum.ewm.dto.ParticipationRequestDto;
@@ -20,7 +18,6 @@ import ru.practicum.ewm.repository.EventRepository;
 import ru.practicum.ewm.repository.ParticipationRequestRepository;
 import ru.practicum.ewm.repository.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ParticipationRequestServiceImpl implements ParticipationRequestService{
+public class ParticipationRequestServiceImpl implements ParticipationRequestService {
 
     private final ParticipationRequestRepository requestRepository;
     private final EventRepository eventRepository;
@@ -58,7 +55,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         //@PatchMapping("users/{userId}/events/{eventId}/requests")
 
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + "user's with id =" +  userId + " was not found"));
+                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + "user's with id =" + userId + " was not found"));
 
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
             throw new IllegalArgumentException("Request moderation not required for this event");
@@ -109,7 +106,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     @Override
     @Transactional
     public ParticipationRequestDto addRequest(Long userId, Long eventId) {
-        // Проверка на существование пользователя и события
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
         Event event = eventRepository.findById(eventId)
@@ -156,7 +152,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     //Получение информации о заявках текущего пользователя на участие в чужих событиях
     // ("/{userId}/requests")
     public List<ParticipationRequestDto> getRequestsByUserId(Long userId) {
-        // Проверка на существование пользователя
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 

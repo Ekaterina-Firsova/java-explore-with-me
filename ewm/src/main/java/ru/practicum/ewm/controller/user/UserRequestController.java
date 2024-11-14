@@ -1,4 +1,5 @@
 package ru.practicum.ewm.controller.user;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -14,22 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.ewm.dto.EventFullDto;
 import ru.practicum.ewm.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.dto.EventRequestStatusUpdateResult;
-import ru.practicum.ewm.dto.EventShortDto;
-import ru.practicum.ewm.dto.NewEventDto;
 
 import ru.practicum.ewm.dto.ParticipationRequestDto;
-import ru.practicum.ewm.dto.UpdateEventUserRequest;
-import ru.practicum.ewm.entity.ParticipationRequest;
-import ru.practicum.ewm.exception.ApiError;
-import ru.practicum.ewm.exception.NotFoundException;
-import ru.practicum.ewm.service.EventService;
 import ru.practicum.ewm.service.ParticipationRequestService;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -59,15 +50,10 @@ public class UserRequestController {
     //Изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя
     @PatchMapping("/{userId}/events/{eventId}/requests")
     public ResponseEntity<EventRequestStatusUpdateResult> changeRequestStatus(
-            @Valid  @RequestBody EventRequestStatusUpdateRequest updateRequest,
+            @Valid @RequestBody EventRequestStatusUpdateRequest updateRequest,
             @PathVariable Long userId,
             @PathVariable Long eventId) {
         EventRequestStatusUpdateResult result = participationRequestService.updateRequestStatus(userId, eventId, updateRequest);
-
-//        // Проверка на наличие отклоненных заявок
-//        if (result.getRejectedRequests() != null && !result.getRejectedRequests().isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(result);
-//        }
 
         return ResponseEntity.ok(result);
     }

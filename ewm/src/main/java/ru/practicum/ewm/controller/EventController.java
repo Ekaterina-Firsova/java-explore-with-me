@@ -1,12 +1,11 @@
 package ru.practicum.ewm.controller;
+
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-//import ru.practicum.ewm.EndpointHitDto;
-//import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.EndpointHitDto;
 import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.dto.EventFullDto;
@@ -89,7 +86,6 @@ public class EventController {
                 .build();
 
         statsClient.saveHit(endpointHitDto);
-
         return ResponseEntity.ok(eventService.getEventByIdAndState(id, EventState.PUBLISHED, request.getRemoteAddr()));
     }
 }

@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 public class ApiError {
@@ -17,7 +16,7 @@ public class ApiError {
     private LocalDateTime timestamp;
 
     public ApiError(HttpStatus status, String message, String reason) {
-        this.status = status.name(); // Преобразуем код статуса в строку
+        this.status = status.name();
         this.reason = reason;
         this.message = message;
         this.timestamp = LocalDateTime.now();

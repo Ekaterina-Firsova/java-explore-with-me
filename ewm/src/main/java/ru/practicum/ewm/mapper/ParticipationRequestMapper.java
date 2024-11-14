@@ -16,5 +16,4 @@ public class ParticipationRequestMapper {
                 .created(request.getCreated())
                 .build();
     }
-
 }

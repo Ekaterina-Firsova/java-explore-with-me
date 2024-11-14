@@ -13,8 +13,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventService {
-//    List<EventFullDto> getEvents(List<Long> user, List<String> states, List<Long> categories,
-//                                 LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size);
 
     EventFullDto updateEvent(Long eventId, UpdateEventAdminRequest updateRequest);
 

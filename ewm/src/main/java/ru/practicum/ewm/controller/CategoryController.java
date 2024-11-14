@@ -1,6 +1,5 @@
 package ru.practicum.ewm.controller;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +44,6 @@ public class CategoryController {
         log.info("Request GET /categories/{}", catId);
 
         CategoryDto category = CategoryMapper.toCategoryDto(categoryService.findById(catId));
-
         return ResponseEntity.ok(category);
     }
 }

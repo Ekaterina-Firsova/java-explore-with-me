@@ -75,15 +75,4 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
     }
-
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ApiError> handleException(Exception ex) {
-//        ApiError apiError = new ApiError(
-//                HttpStatus.FORBIDDEN,
-//                "Only pending or canceled events can be changed" + Collections.singletonList(ex.getMessage()),
-//                "For the requested operation the conditions are not met."
-//        );
-//        return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
-//    }
-
 }

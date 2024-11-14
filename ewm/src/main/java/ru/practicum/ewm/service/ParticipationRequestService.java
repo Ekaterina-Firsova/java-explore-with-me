@@ -1,6 +1,5 @@
 package ru.practicum.ewm.service;
 
-
 import jakarta.validation.constraints.NotNull;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.EventRequestStatusUpdateRequest;
