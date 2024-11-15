@@ -33,7 +33,6 @@ public class UserServiceImpl implements UserService {
             users = repository.findByIdIn(ids, Sort.by("id"));
         }
 
-        // Применяем смещение и ограничение
         int toIndex = Math.min(from + size, users.size());
         if (from > users.size()) {
             return Collections.emptyList();

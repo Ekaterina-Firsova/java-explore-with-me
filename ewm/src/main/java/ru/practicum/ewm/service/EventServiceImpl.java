@@ -47,7 +47,6 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateEvent(Long eventId, UpdateEventAdminRequest updateRequest) {
-        //редактирование события администратором /admin/events/{eventId}
 
         if (updateRequest.getEventDate() != null && updateRequest.getEventDate().isBefore(LocalDateTime.now())) {
             throw new BadRequestException("Дата начала события должна быть позже текущей");
@@ -56,7 +55,6 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
 
         if (updateRequest.getStateAction() != null && updateRequest.getStateAction().equals(AdminStateAction.PUBLISH_EVENT)) {
-            // Проверяем дату начала
             if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
                 throw new ConflictException("Дата начала события должна быть не ранее чем за час от даты публикации");
             }
@@ -65,7 +63,6 @@ public class EventServiceImpl implements EventService {
         if (updateRequest.getStateAction() != null) {
             AdminStateAction adminAction = updateRequest.getStateAction();
 
-            // изменение состояния события
             if (adminAction.equals(AdminStateAction.PUBLISH_EVENT)) {
                 if (event.getState().equals(EventState.PUBLISHED)) {
                     throw new ConflictException("Cannot publish the event because it's already published");
@@ -114,7 +111,6 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(eventRepository.save(event));
     }
 
-    //просмотр события "/admin/events"
     @Override
     public List<EventFullDto> getEvents(
             List<Long> users, List<String> states, List<Long> categories,
@@ -145,10 +141,8 @@ public class EventServiceImpl implements EventService {
             builder.and(qEvent.eventDate.loe(rangeEnd));
         }
 
-        // Настройка пагинации
         Pageable pageable = PageRequest.of(from / size, size);
 
-        // Вызов метода репозитория с фильтром и пагинацией
         return eventRepository.findAll(builder, pageable)
                 .stream()
                 .map(EventMapper::toEventFullDto)
@@ -158,10 +152,8 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto addEvent(Long userId, @Valid NewEventDto newEventDto) {
-        // Проверяем, существует ли пользователь
         User user = userService.findById(userId);
 
-        // Проверяем, существует ли категория
         Category category = categoryService.findById(Long.valueOf(newEventDto.getCategory()));
 
         Event event = Event.builder()
@@ -185,7 +177,6 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getEvents(Long userId, Integer from, Integer size) {
-        //получение события, добавленного пользователем "users/{userId}/events"
         Pageable pageable = PageRequest.of(from / size, size);
 
         BooleanBuilder builder = new BooleanBuilder();
@@ -201,17 +192,14 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getEvent(Long userId, Long eventId) {
-        // получение полной информации о событии добавленной текущем пользователем "users/{userId}/events/{eventId}"
         Optional<Event> event = eventRepository.findByInitiatorIdAndId(userId, eventId);
         return EventMapper.toEventFullDto(event
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " for user with id=" + userId + " was not found.")));
     }
 
     @Override
-    // Изменение события /users/{userId}/events/{eventId}
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest updateRequest) {
 
-        // Проверяем дату события
         LocalDateTime minEventDate = LocalDateTime.now().plusHours(2);
         if (updateRequest.getEventDate() != null && updateRequest.getEventDate().isBefore(minEventDate)) {
             throw new BadRequestException("Event date must be at least two hours from now.");
@@ -229,7 +217,6 @@ public class EventServiceImpl implements EventService {
         }
 
         if (updateRequest.getCategory() != null) {
-            // Проверяем, существует ли категория
             Category category = categoryService.findById(updateRequest.getCategory());
             event.setCategory(category);
         }
@@ -273,12 +260,10 @@ public class EventServiceImpl implements EventService {
             }
         }
 
-        // Сохраняем обновленное событие в базе данных
         return EventMapper.toEventFullDto(eventRepository.save(event));
     }
 
     @Override
-    // /events - получение всех опубликованных событий
     public List<EventShortDto> getFilteredEvents(String text, List<Long> categories, Boolean paid,
                                                  LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                                  Boolean onlyAvailable, String sort, Integer from, Integer size) {
@@ -331,20 +316,16 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto getEventByIdAndState(Long id, EventState state, String ipAddress) {
-        // /events/{id} - получение опубликованного события по id
 
         Event event = eventRepository.findByIdAndState(id, state)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + id + " was not found."));
 
-        // Проверка на уникальность просмотра по IP
         if (!eventViewRepository.existsByEventIdAndIpAddress(id, ipAddress)) {
-            // Сохраняем информацию о просмотре и увеличиваем счетчик
             EventView view = new EventView();
             view.setEventId(id);
             view.setIpAddress(ipAddress);
             eventViewRepository.save(view);
 
-            // Увеличиваем счетчик просмотров
             event.setViews(event.getViews() == null ? 1 : event.getViews() + 1);
             eventRepository.save(event);
         }

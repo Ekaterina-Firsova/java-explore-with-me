@@ -11,6 +11,9 @@ import java.util.List;
 public class UserMapper {
 
     public UserDto toUserDto(User user) {
+        if (user == null) {
+            return null;
+        }
         return UserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -19,6 +22,9 @@ public class UserMapper {
     }
 
     public User toUser(UserDto userDto) {
+        if (userDto == null) {
+            return null;
+        }
         return User.builder()
                 .id(userDto.getId())
                 .email(userDto.getEmail())
@@ -27,6 +33,9 @@ public class UserMapper {
     }
 
     public User toUser(UserShortDto userDto) {
+        if (userDto == null) {
+            return null;
+        }
         return User.builder()
                 .id(userDto.getId())
                 .name(userDto.getName())
@@ -34,6 +43,9 @@ public class UserMapper {
     }
 
     public UserShortDto toUserShortDto(User user) {
+        if (user == null) {
+            return null;
+        }
         return UserShortDto.builder()
                 .id(user.getId())
                 .name(user.getName())

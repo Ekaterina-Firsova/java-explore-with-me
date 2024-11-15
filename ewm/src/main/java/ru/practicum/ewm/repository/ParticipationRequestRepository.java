@@ -18,7 +18,6 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     int countByEventAndStatus(Long eventId, UserStateRequest status);
 
-    // Метод для получения заявок по eventId и списку requestIds, отсортированных по дате создания
     @Query("SELECT pr FROM ParticipationRequest pr WHERE pr.event = :eventId AND pr.id IN :requestIds ORDER BY pr.created ASC")
     List<ParticipationRequest> findByEventIdAndRequestIdsOrderByCreated(
             @Param("eventId") Long eventId,

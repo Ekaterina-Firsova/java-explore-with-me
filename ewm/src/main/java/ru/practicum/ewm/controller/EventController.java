@@ -38,17 +38,17 @@ public class EventController {
 
     @GetMapping
     public ResponseEntity<List<EventShortDto>> getEvents(
-            @RequestParam(required = false) String text, // текст для поиска в аннотации и описании события
-            @RequestParam(required = false) List<Long> categories, // список id категорий для поиска
-            @RequestParam(required = false) Boolean paid, // поиск платных/бесплатных событий
+            @RequestParam(required = false) String text,
+            @RequestParam(required = false) List<Long> categories,
+            @RequestParam(required = false) Boolean paid,
             @RequestParam(required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeStart, // дата и время начала диапазона поиска
+            @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeStart,
             @RequestParam(required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeEnd, // дата и время окончания диапазона поиска
-            @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable, // поиск событий с доступными местами
-            @RequestParam(required = false) String sort, // сортировка: по дате события или просмотрам
-            @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer from, // количество событий, которые нужно пропустить
-            @RequestParam(required = false, defaultValue = "10") @Positive Integer size, // количество событий в ответе
+            @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeEnd,
+            @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(required = false, defaultValue = "10") @Positive Integer size,
             HttpServletRequest request
     ) {
         log.info("Request GET /events with parameters: text: {}, categories: {}, paid: {}, rangeStart: {}, rangeEnd: {}, onlyAvailable: {}, sort: {}, from: {}, size: {}",
@@ -62,7 +62,6 @@ public class EventController {
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size
         );
 
-        // Запись запроса в статистику
         EndpointHitDto endpointHitDto = EndpointHitDto.builder()
                 .app("ewm-main-service")
                 .timestamp(LocalDateTime.now())
@@ -77,7 +76,6 @@ public class EventController {
 
     @GetMapping("/{id}")
     public ResponseEntity<EventFullDto> getEventById(@PathVariable @NotNull Long id, HttpServletRequest request) {
-        // Записываем запрос в статистику
         EndpointHitDto endpointHitDto = EndpointHitDto.builder()
                 .app("ewm-main-service")
                 .timestamp(LocalDateTime.now())

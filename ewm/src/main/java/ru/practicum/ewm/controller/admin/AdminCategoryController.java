@@ -27,24 +27,21 @@ public class AdminCategoryController {
 
     private final CategoryService categoryService;
 
-    // Добавление новой категории
     @PostMapping
     public ResponseEntity<CategoryDto> addCategory(@Valid @RequestBody NewCategoryDto newCategoryDto) {
         CategoryDto createdCategory = categoryService.createCategory(newCategoryDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
 
-    // Удаление категории по ID
-    @DeleteMapping("/{catId}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long catId) {
-        categoryService.deleteCategory(catId);
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
+        categoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
     }
 
-    // Обновление данных категории
-    @PatchMapping("/{catId}")
-    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long catId, @Valid @RequestBody CategoryDto categoryDto) {
-        CategoryDto updatedCategory = categoryService.updateCategory(catId, categoryDto);
+    @PatchMapping("/{categoryId}")
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long categoryId, @Valid @RequestBody CategoryDto categoryDto) {
+        CategoryDto updatedCategory = categoryService.updateCategory(categoryId, categoryDto);
         return ResponseEntity.ok(updatedCategory);
     }
 }

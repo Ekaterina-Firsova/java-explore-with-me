@@ -18,7 +18,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
 
     Optional<Event> findByInitiatorIdAndId(Long userId, Long eventId);
 
-    // Метод для поиска события по идентификатору инициатора и идентификатору события
     @Query("SELECT e FROM Event e WHERE e.id = :eventId AND e.initiator.id = :userId")
     Optional<Event> findByIdAndInitiatorId(@Param("eventId") Long eventId, @Param("userId") Long userId);
 

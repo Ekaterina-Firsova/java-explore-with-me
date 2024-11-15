@@ -11,6 +11,9 @@ import java.util.List;
 public class EventMapper {
 
     public EventFullDto toEventFullDto(Event event) {
+        if (event == null) {
+            return null;
+        }
         return EventFullDto.builder()
                 .id(event.getId())
                 .eventDate(event.getEventDate())
@@ -32,6 +35,9 @@ public class EventMapper {
     }
 
     public Event toEvent(EventFullDto eventFullDto) {
+        if (eventFullDto == null) {
+            return null;
+        }
         return Event.builder()
                 .id(eventFullDto.getId())
                 .eventDate(eventFullDto.getEventDate())
@@ -59,6 +65,9 @@ public class EventMapper {
     }
 
     public EventShortDto toEventShortDto(Event event) {
+        if (event == null) {
+            return null;
+        }
         return EventShortDto.builder()
                 .id(event.getId())
                 .eventDate(event.getEventDate())

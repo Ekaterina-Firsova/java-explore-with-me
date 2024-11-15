@@ -26,7 +26,6 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
 
-    // Добавление новой категории
     @Transactional
     @Override
     public CategoryDto createCategory(NewCategoryDto newCategoryDto) {
@@ -39,12 +38,11 @@ public class CategoryServiceImpl implements CategoryService {
         return new CategoryDto(savedCategory.getId(), savedCategory.getName());
     }
 
-    // Удаление категории по ID
     @Transactional
     @Override
-    public void deleteCategory(Long catId) {
-        Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Category with id=" + catId + " was not found"));
+    public void deleteCategory(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Category with id=" + categoryId + " was not found"));
 
         if (categoryHasEvents(category)) {
             throw new ConflictException("The category is not empty");
@@ -52,31 +50,28 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.delete(category);
     }
 
-    // Обновление данных категории
     @Transactional
     @Override
-    public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
-        Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Category with id=" + catId + " was not found"));
+    public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Category with id=" + categoryId + " was not found"));
 
         if (!category.getName().equals(categoryDto.getName()) && categoryRepository.existsByName(categoryDto.getName())) {
             throw new ConflictException("Имя категории должно быть уникальным");
         }
 
         category.setName(categoryDto.getName());
-        Category updatedCategory = categoryRepository.save(category);
-        return new CategoryDto(updatedCategory.getId(), updatedCategory.getName());
+        return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
     private boolean categoryHasEvents(Category category) {
-        // Проверяем, есть ли хотя бы одно событие с данной категорией
         return eventRepository.existsByCategory(category);
     }
 
     @Override
     public Category findById(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Категория с таким ID не найдена"));
+                .orElseThrow(() -> new NotFoundException("Категория с ID=" + id + " не найдена"));
     }
 
     @Override

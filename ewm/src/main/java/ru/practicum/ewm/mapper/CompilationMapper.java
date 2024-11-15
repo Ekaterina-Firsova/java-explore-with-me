@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 public class CompilationMapper {
 
     public static Compilation toCompilation(NewCompilationDto newCompilationDto, List<Event> events) {
+        if (newCompilationDto == null) {
+            return null;
+        }
         Compilation compilation = new Compilation();
 
         Set<Event> compilationEvents = events.stream()
@@ -27,6 +30,9 @@ public class CompilationMapper {
     }
 
     public static CompilationDto toCompilationDto(Compilation compilation) {
+        if (compilation == null) {
+            return null;
+        }
         CompilationDto compilationDto = new CompilationDto();
 
         compilationDto.setId(compilation.getId());

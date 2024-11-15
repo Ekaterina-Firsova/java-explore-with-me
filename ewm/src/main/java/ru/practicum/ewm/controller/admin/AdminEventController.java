@@ -31,18 +31,17 @@ public class AdminEventController {
 
     private final EventService eventService;
 
-    //просмотр события
     @GetMapping
     public ResponseEntity<List<EventFullDto>> getEvents(
-            @RequestParam(required = false) List<Long> users, //список id пользователей, чьи события нужно найти
-            @RequestParam(required = false) List<String> states, //список состояний в которых находятся искомые события
-            @RequestParam(required = false) List<Long> categories, //список id категорий в которых будет вестись поиск
+            @RequestParam(required = false) List<Long> users,
+            @RequestParam(required = false) List<String> states,
+            @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeStart, //дата и время не раньше которых должно произойти событие
+            @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeStart,
             @RequestParam(required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeEnd, //дата и время не позже которых должно произойти событие
-            @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer from, //количество событий, которые нужно пропустить для формирования текущего набора
-            @RequestParam(required = false, defaultValue = "10") @Min(1) Integer size //количество событий в наборе
+            @DateTimeFormat(pattern = "yyyy-MM-dd' 'HH:mm:ss") LocalDateTime rangeEnd,
+            @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(required = false, defaultValue = "10") @Min(1) Integer size
     ) {
         log.info("Request GET /admin/events with parameters user: {}, states: {}, categories: {}, rangeStart: {}, rangeEnd: {}, from: {}, size: {}",
                 users, states, categories, rangeStart, rangeEnd, from, size);
@@ -52,7 +51,6 @@ public class AdminEventController {
         return ResponseEntity.ok(events);
     }
 
-    // редактирование события
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventFullDto> updateEvent(
             @Valid @RequestBody UpdateEventAdminRequest updateRequest,

@@ -8,6 +8,9 @@ import ru.practicum.ewm.entity.ParticipationRequest;
 public class ParticipationRequestMapper {
 
     public ParticipationRequestDto toDto(ParticipationRequest request) {
+        if (request == null) {
+            return null;
+        }
         return ParticipationRequestDto.builder()
                 .id(request.getId())
                 .requester(request.getRequester().getId())
