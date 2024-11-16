@@ -62,3 +62,13 @@ CREATE TABLE IF NOT EXISTS event_views (
     ip_address VARCHAR(45) NOT NULL,
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS locations (
+    id SERIAL PRIMARY KEY, -- Уникальный идентификатор локации
+    name VARCHAR(100) NOT NULL, -- Название локации (город, театр, концертный зал и т.д.)
+    lat DOUBLE PRECISION NOT NULL CHECK (lat >= -90 AND lat <= 90), -- Широта (значение от -90 до 90)
+    lon DOUBLE PRECISION NOT NULL CHECK (lon >= -180 AND lon <= 180), -- Долгота (значение от -180 до 180)
+    radius DOUBLE PRECISION NOT NULL CHECK (radius >= 0), -- Радиус в метрах (должен быть >= 0)
+    CONSTRAINT unique_location_name UNIQUE (name),
+    CONSTRAINT unique_location_coordinates UNIQUE (lat, lon)
+);

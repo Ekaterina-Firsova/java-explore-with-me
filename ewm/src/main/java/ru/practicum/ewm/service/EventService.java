@@ -10,6 +10,7 @@ import ru.practicum.ewm.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.dto.enumerate.EventState;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 public interface EventService {
@@ -29,7 +30,10 @@ public interface EventService {
     EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest updateRequest);
 
     List<EventShortDto> getFilteredEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
-                                          LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size);
+                                          LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size,
+                                          Long locationId);
 
     EventFullDto getEventByIdAndState(@NotNull Long id, @NotNull EventState state, @NotNull String ipAddress);
+
+    List<EventShortDto> findEventsByLocation(Long locationId);
 }

@@ -32,4 +32,6 @@ public class EventShortDto {
     private String title; // Заголовок события
 
     private Integer views; // Количество просмотров события
+
+    private String locationName;
 }

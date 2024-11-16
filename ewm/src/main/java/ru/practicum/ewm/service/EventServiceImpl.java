@@ -19,14 +19,17 @@ import ru.practicum.ewm.dto.enumerate.UserStateAction;
 import ru.practicum.ewm.entity.Category;
 import ru.practicum.ewm.entity.Event;
 import ru.practicum.ewm.entity.EventView;
+import ru.practicum.ewm.entity.Location;
 import ru.practicum.ewm.entity.QEvent;
 import ru.practicum.ewm.entity.User;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.mapper.EventMapper;
+import ru.practicum.ewm.mapper.LocationMapper;
 import ru.practicum.ewm.repository.EventRepository;
 import ru.practicum.ewm.repository.EventViewRepository;
+import ru.practicum.ewm.repository.LocationRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,6 +46,7 @@ public class EventServiceImpl implements EventService {
     private final UserService userService;
     private final CategoryService categoryService;
     private final EventViewRepository eventViewRepository;
+    private final LocationRepository locationRepository;
 
     @Override
     @Transactional
@@ -266,7 +270,8 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventShortDto> getFilteredEvents(String text, List<Long> categories, Boolean paid,
                                                  LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                                 Boolean onlyAvailable, String sort, Integer from, Integer size) {
+                                                 Boolean onlyAvailable, String sort, Integer from, Integer size,
+                                                 Long locationId) {
         if (rangeStart == null) {
             rangeStart = LocalDateTime.now();
         }
@@ -307,6 +312,24 @@ public class EventServiceImpl implements EventService {
             pageable = PageRequest.of(from / size, size, Sort.by("views").descending());
         }
 
+        if (locationId != null && locationId > 0) {
+            Location location = locationRepository.findById(locationId)
+                    .orElseThrow(() -> new NotFoundException("Location with id=" + locationId + " was not found"));
+
+            return eventRepository.findAll(builder, pageable)
+                    .stream()
+                    .filter(event -> {
+                        double distance = calculateDistance(
+                                location.getLat(),
+                                location.getLon(),
+                                event.getLocationDto().getLat(),
+                                event.getLocationDto().getLon());
+                        return distance <= location.getRadius();
+                    })
+                    .map(EventMapper::toEventShortDto)
+                    .collect(Collectors.toList());
+        }
+
         return eventRepository.findAll(builder, pageable)
                 .stream()
                 .map(EventMapper::toEventShortDto) // Map to EventShortDto
@@ -333,5 +356,37 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
 
         return EventMapper.toEventFullDto(event);
+    }
+
+    @Override
+    public List<EventShortDto> findEventsByLocation(Long locationId) {
+        //по координатам, указанным локации (id локации в запросе) ищем все события в радиусе, указанном в локации
+        // смотрим коодринаты для выбранной локации
+        Location location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new NotFoundException("Location with id=" + locationId + " was not found"));
+
+        //ищем события в этой локации
+        return eventRepository.findAll().stream()
+                .filter(event -> {
+                    double distance = calculateDistance(
+                            location.getLat(),
+                            location.getLon(),
+                            event.getLocationDto().getLat(),
+                            event.getLocationDto().getLon());
+                    return distance <= location.getRadius();
+                })
+                .map(EventMapper::toEventShortDto)
+                .collect(Collectors.toList());
+    }
+
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        double earthRadius = 6371000;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return earthRadius * c;
     }
 }
