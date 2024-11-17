@@ -21,16 +21,16 @@ public class LocationServiceImpl implements LocationService {
 
     private final LocationRepository locationRepository;
 
-   @Override
-   @Transactional
+    @Override
+    @Transactional
     public LocationAdminDto addLocation(LocationAdminDto locationDto) {
-       try {
-           Location location = LocationMapper.toLocation(locationDto);
-           return LocationMapper.toLocationAdminDto(locationRepository.save(location));
-       } catch (DataIntegrityViolationException e) {
-           throw new ConflictException("Location with the same name or coordinates already exists.");
-       }
-   }
+        try {
+            Location location = LocationMapper.toLocation(locationDto);
+            return LocationMapper.toLocationAdminDto(locationRepository.save(location));
+        } catch (DataIntegrityViolationException e) {
+            throw new ConflictException("Location with the same name or coordinates already exists.");
+        }
+    }
 
     @Override
     public List<LocationAdminDto> getAllLocations() {
@@ -40,6 +40,7 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
+    @Transactional
     public void deleteLocation(Long locationId) {
         if (!locationRepository.existsById(locationId)) {
             throw new NotFoundException("Location with id=" + locationId + " was not found");

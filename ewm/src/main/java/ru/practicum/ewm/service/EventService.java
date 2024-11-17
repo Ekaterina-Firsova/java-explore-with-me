@@ -4,13 +4,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import ru.practicum.ewm.dto.EventFullDto;
 import ru.practicum.ewm.dto.EventShortDto;
+import ru.practicum.ewm.dto.LocationDto;
 import ru.practicum.ewm.dto.NewEventDto;
 import ru.practicum.ewm.dto.UpdateEventAdminRequest;
 import ru.practicum.ewm.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.dto.enumerate.EventState;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 public interface EventService {
@@ -35,5 +35,5 @@ public interface EventService {
 
     EventFullDto getEventByIdAndState(@NotNull Long id, @NotNull EventState state, @NotNull String ipAddress);
 
-    List<EventShortDto> findEventsByLocation(Long locationId);
+    String findLocationName(LocationDto locationDto);
 }

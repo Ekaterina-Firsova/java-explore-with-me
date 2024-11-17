@@ -33,5 +33,5 @@ public class EventShortDto {
 
     private Integer views; // Количество просмотров события
 
-    private String locationName;
+    private String locationName; // Наименование локации
 }

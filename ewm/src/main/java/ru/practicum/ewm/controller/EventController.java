@@ -21,12 +21,9 @@ import ru.practicum.ewm.dto.EventShortDto;
 import ru.practicum.ewm.dto.enumerate.EventState;
 import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.service.EventService;
-import ru.practicum.ewm.mapper.EventMapper;
-
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/events")
@@ -88,12 +85,6 @@ public class EventController {
 
         statsClient.saveHit(endpointHitDto);
         return ResponseEntity.ok(eventService.getEventByIdAndState(id, EventState.PUBLISHED, request.getRemoteAddr()));
-    }
-
-    @GetMapping("/location/{locationId}")
-    public ResponseEntity<List<EventShortDto>> getEventsByLocation(@PathVariable Long locationId) {
-        List<EventShortDto> events = eventService.findEventsByLocation(locationId);
-        return ResponseEntity.ok(events);
     }
 
 }

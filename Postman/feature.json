@@ -1,0 +1,168 @@
+{
+  "info": {
+    "_postman_id": "f59596c0-cc9f-4303-8ed6-c7e42c83c5b5",
+    "name": "Admin Locations API 2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "26952950"
+  },
+  "item": [
+    {
+      "name": "Create Location",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Response status code is 201\", function () {\r",
+              "    pm.expect(pm.response.code).to.equal(201);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Response has the required fields\", function () {\r",
+              "    const responseData = pm.response.json();\r",
+              "    \r",
+              "    pm.expect(responseData).to.be.an('object');\r",
+              "    pm.expect(responseData).to.have.property('id');\r",
+              "    pm.expect(responseData).to.have.property('name');\r",
+              "    pm.expect(responseData).to.have.property('lat');\r",
+              "    pm.expect(responseData).to.have.property('lon');\r",
+              "    pm.expect(responseData).to.have.property('radius');\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Name is a non-empty string\", function () {\r",
+              "  const responseData = pm.response.json();\r",
+              "  \r",
+              "  pm.expect(responseData).to.be.an('object');\r",
+              "  pm.expect(responseData.name).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Name should be a non-empty string\");\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Latitude and longitude are valid coordinates\", function () {\r",
+              "    const responseData = pm.response.json();\r",
+              "    \r",
+              "    pm.expect(responseData).to.be.an('object');\r",
+              "    pm.expect(responseData.lat).to.be.within(-90, 90);\r",
+              "    pm.expect(responseData.lon).to.be.within(-180, 180);\r",
+              "});\r",
+              "\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"Moscow\",\r\n  \"lat\": 55.7558,\r\n  \"lon\": 37.6176,\r\n  \"radius\": 5000\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/admin/locations",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "admin",
+            "locations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Locations",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Response status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response has the required fields - id, name, lat, lon, and radius\", function () {\r",
+              "    const responseData = pm.response.json();\r",
+              "    \r",
+              "    pm.expect(responseData).to.be.an('array');\r",
+              "    responseData.forEach(location => {\r",
+              "        pm.expect(location.id).to.exist;\r",
+              "        pm.expect(location.name).to.exist;\r",
+              "        pm.expect(location.lat).to.exist;\r",
+              "        pm.expect(location.lon).to.exist;\r",
+              "        pm.expect(location.radius).to.exist;\r",
+              "    });\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/admin/locations",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "admin",
+            "locations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Location",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Response status code is 204\", function () {\r",
+              "    pm.expect(pm.response.code).to.equal(204);\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/admin/locations/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "admin",
+            "locations",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
