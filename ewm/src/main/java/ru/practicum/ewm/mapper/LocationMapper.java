@@ -8,7 +8,7 @@ import ru.practicum.ewm.entity.Location;
 public class LocationMapper {
 
     public LocationAdminDto toLocationAdminDto(Location location) {
-        if(location == null) {
+        if (location == null) {
             return null;
         }
         return LocationAdminDto.builder()
@@ -21,7 +21,7 @@ public class LocationMapper {
     }
 
     public Location toLocation(LocationAdminDto location) {
-        if(location == null) {
+        if (location == null) {
             return null;
         }
         return Location.builder()
