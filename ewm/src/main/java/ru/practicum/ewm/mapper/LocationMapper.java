@@ -7,7 +7,7 @@ import ru.practicum.ewm.entity.Location;
 @UtilityClass
 public class LocationMapper {
 
-    public LocationAdminDto toLocationAdminDto(Location location ) {
+    public LocationAdminDto toLocationAdminDto(Location location) {
         return LocationAdminDto.builder()
                 .lon(location.getLon())
                 .lat(location.getLat())
@@ -17,7 +17,7 @@ public class LocationMapper {
                 .build();
     }
 
-    public Location toLocation (LocationAdminDto location) {
+    public Location toLocation(LocationAdminDto location) {
         return Location.builder()
                 .lon(location.getLon())
                 .lat(location.getLat())
