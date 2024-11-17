@@ -1,3 +1,5 @@
+https://github.com/Ekaterina-Firsova/java-explore-with-me/pull/3
+
 # Обновление: Добавление названия локации для событий
 
 ## Описание фичи
