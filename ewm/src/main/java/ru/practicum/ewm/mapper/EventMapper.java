@@ -78,6 +78,7 @@ public class EventMapper {
                 .title(event.getTitle())
                 .views(event.getViews())
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .locationName(event.getLocationName())
                 .build();
     }
 

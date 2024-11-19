@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import ru.practicum.ewm.dto.EventFullDto;
 import ru.practicum.ewm.dto.EventShortDto;
+import ru.practicum.ewm.dto.LocationDto;
 import ru.practicum.ewm.dto.NewEventDto;
 import ru.practicum.ewm.dto.UpdateEventAdminRequest;
 import ru.practicum.ewm.dto.UpdateEventUserRequest;
@@ -29,7 +30,10 @@ public interface EventService {
     EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest updateRequest);
 
     List<EventShortDto> getFilteredEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
-                                          LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size);
+                                          LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size,
+                                          Long locationId);
 
     EventFullDto getEventByIdAndState(@NotNull Long id, @NotNull EventState state, @NotNull String ipAddress);
+
+    String findLocationName(LocationDto locationDto);
 }

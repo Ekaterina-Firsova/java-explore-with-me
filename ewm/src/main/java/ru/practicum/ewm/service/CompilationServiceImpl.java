@@ -11,12 +11,14 @@ import ru.practicum.ewm.dto.NewCompilationDto;
 import ru.practicum.ewm.dto.UpdateCompilationRequest;
 import ru.practicum.ewm.entity.Compilation;
 import ru.practicum.ewm.entity.Event;
+import ru.practicum.ewm.entity.Location;
 import ru.practicum.ewm.entity.QCompilation;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.mapper.CompilationMapper;
 import ru.practicum.ewm.repository.CompilationRepository;
 import ru.practicum.ewm.repository.EventRepository;
+import ru.practicum.ewm.repository.LocationRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +33,8 @@ public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
     private final QCompilation qCompilation = QCompilation.compilation;
+    private final LocationRepository locationRepository;
+    private final CompilationMapper compilationMapper;
 
     @Override
     @Transactional
@@ -49,7 +53,7 @@ public class CompilationServiceImpl implements CompilationService {
 
         try {
             Compilation savedCompilation = compilationRepository.save(compilation);
-            return CompilationMapper.toCompilationDto(savedCompilation);
+            return compilationMapper.toCompilationDto(savedCompilation);
         } catch (ConflictException e) {
             throw new ConflictException("Integrity constraint has been violated.");
         }
@@ -83,7 +87,7 @@ public class CompilationServiceImpl implements CompilationService {
 
         compilationRepository.save(compilation);
 
-        return CompilationMapper.toCompilationDto(compilation);
+        return compilationMapper.toCompilationDto(compilation);
     }
 
     @Override
@@ -99,7 +103,7 @@ public class CompilationServiceImpl implements CompilationService {
 
         return compilationRepository.findAll(builder, pageable)
                 .stream()
-                .map(CompilationMapper::toCompilationDto)
+                .map(compilationMapper::toCompilationDto)
                 .collect(Collectors.toList());
     }
 
@@ -107,6 +111,19 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto getCompilationById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation with id=" + compId + " was not found"));
-        return CompilationMapper.toCompilationDto(compilation);
+        return compilationMapper.toCompilationDto(compilation);
+    }
+
+    private String calculateLocationNameForEvent(Event event) {
+        if (event.getLocationDto() != null) {
+            Pageable pageable = PageRequest.of(0, 1);
+            List<Location> locations = locationRepository.findNearestByCoordinates(
+                    event.getLocationDto().getLat(),
+                    event.getLocationDto().getLon(),
+                    pageable
+            );
+            return locations.isEmpty() ? null : locations.getFirst().getName();
+        }
+        return null;
     }
 }

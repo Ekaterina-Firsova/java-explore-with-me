@@ -1,18 +1,25 @@
 package ru.practicum.ewm.mapper;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.practicum.ewm.dto.CompilationDto;
 import ru.practicum.ewm.dto.EventShortDto;
 import ru.practicum.ewm.dto.NewCompilationDto;
 import ru.practicum.ewm.entity.Compilation;
 import ru.practicum.ewm.entity.Event;
+import ru.practicum.ewm.service.EventService;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Component
+@RequiredArgsConstructor
 public class CompilationMapper {
 
-    public static Compilation toCompilation(NewCompilationDto newCompilationDto, List<Event> events) {
+    private final EventService eventService;
+
+    public Compilation toCompilation(NewCompilationDto newCompilationDto, List<Event> events) {
         if (newCompilationDto == null) {
             return null;
         }
@@ -29,7 +36,7 @@ public class CompilationMapper {
         return compilation;
     }
 
-    public static CompilationDto toCompilationDto(Compilation compilation) {
+    public CompilationDto toCompilationDto(Compilation compilation) {
         if (compilation == null) {
             return null;
         }
@@ -40,6 +47,7 @@ public class CompilationMapper {
         compilationDto.setTitle(compilation.getTitle());
 
         List<EventShortDto> eventShortDtos = compilation.getEvents().stream()
+                .peek(event -> event.setLocationName(eventService.findLocationName(event.getLocationDto())))
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
 

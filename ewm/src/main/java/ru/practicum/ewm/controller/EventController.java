@@ -22,7 +22,6 @@ import ru.practicum.ewm.dto.enumerate.EventState;
 import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.service.EventService;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -49,6 +48,7 @@ public class EventController {
             @RequestParam(required = false) String sort,
             @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer from,
             @RequestParam(required = false, defaultValue = "10") @Positive Integer size,
+            @RequestParam(required = false) @Positive Long locationId,
             HttpServletRequest request
     ) {
         log.info("Request GET /events with parameters: text: {}, categories: {}, paid: {}, rangeStart: {}, rangeEnd: {}, onlyAvailable: {}, sort: {}, from: {}, size: {}",
@@ -59,7 +59,7 @@ public class EventController {
         }
 
         List<EventShortDto> events = eventService.getFilteredEvents(
-                text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size
+                text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, locationId
         );
 
         EndpointHitDto endpointHitDto = EndpointHitDto.builder()
@@ -86,4 +86,5 @@ public class EventController {
         statsClient.saveHit(endpointHitDto);
         return ResponseEntity.ok(eventService.getEventByIdAndState(id, EventState.PUBLISHED, request.getRemoteAddr()));
     }
+
 }
